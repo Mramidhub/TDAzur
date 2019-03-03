@@ -1,0 +1,25 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AppManager : MonoBehaviour
+{
+
+    public static AppManager instance;
+
+    UIManager uIManager;
+    GameLogic gameLogic;
+
+    public enum GameState { Lobby, Game}
+    GameState gameState = GameState.Lobby;
+
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+    }
+
+}
