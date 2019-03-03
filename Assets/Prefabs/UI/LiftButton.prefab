@@ -221,4 +221,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c4f06f8924f2ca46813709d8ccfd6bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floorNumber: 1
+  floorNumber: 0

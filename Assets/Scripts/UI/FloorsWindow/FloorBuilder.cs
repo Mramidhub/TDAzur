@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class FloorBuilder : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] GameObject prefab;
 
-    // Update is called once per frame
-    void Update()
+    public GameObject BuildFloor()
     {
-        
+        var newFloor = Instantiate(prefab);
+        return newFloor;
     }
 }

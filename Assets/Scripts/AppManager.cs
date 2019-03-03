@@ -24,9 +24,9 @@ public class AppManager : MonoBehaviour
         gameLogic = FindObjectOfType<GameLogic>();
     }
 
-    void InitApp()
+    public void InitApp(int floors)
     {
-        gameLogic.InitGame(3);
+        gameLogic.InitGame(floors);
     }
 
 }

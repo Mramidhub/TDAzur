@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class Floor : UIBase
 {
-
+    public int floorNumber = 0;
 }

@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class LiftButton : MonoBehaviour
 {
-    [SerializeField] int floorNumber = 0;
-    Lift lift;
+    public int floorNumber = 0;
+    GameLogic gameLogic;
 
     private void Start()
     {
-        lift = FindObjectOfType<Lift>();
+        gameLogic = FindObjectOfType<GameLogic>();
     }
 
     public void PressOn()
     {
-        if (lift)
+        if (gameLogic)
         {
             Debug.Log("press floor " + floorNumber);
-            lift.AddDestinationFloor(floorNumber);
+            gameLogic.AddDestinationFloor(floorNumber);
         }
     }
 }
