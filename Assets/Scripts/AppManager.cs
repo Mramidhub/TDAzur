@@ -20,6 +20,13 @@ public class AppManager : MonoBehaviour
         {
             instance = this;
         }
+
+        gameLogic = FindObjectOfType<GameLogic>();
+    }
+
+    void InitApp()
+    {
+        gameLogic.InitGame(3);
     }
 
 }

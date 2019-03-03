@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Lift : MonoBehaviour
 {
-    ControlPanel panel;
-
     float liftSpeed = 1f;
     float liftSpeedTemp = 1f;
     float openDoorTime = 1f;
@@ -36,6 +34,7 @@ public class Lift : MonoBehaviour
     {
         if (liftState == LiftState.stopped)
         {
+            Debug.Log("stopped ");
             return;
         }
 
@@ -47,8 +46,16 @@ public class Lift : MonoBehaviour
                 return;
             }
 
+            Debug.Log("door closed ");
+
             openDoorTime = tempOpenDoorTime;
             liftState = previosState;
+            Debug.Log("status " + liftState);
+
+            if (currentFloor == destinationFloors[destinationFloors.Count - 1])
+            {
+                liftState = LiftState.stopped;
+            }
             return;
         }
 
@@ -67,6 +74,7 @@ public class Lift : MonoBehaviour
             {
                 previosState = liftState;
                 liftState = LiftState.openned;
+                Debug.Log("next floor up " + currentFloor + " " + "door open");
             }
         }
         else if(liftState == LiftState.down)
@@ -82,6 +90,8 @@ public class Lift : MonoBehaviour
 
             if (destinationFloors.Contains(currentFloor))
             {
+                Debug.Log("next floor down " + currentFloor + " " + "door open");
+
                 previosState = liftState;
                 liftState = LiftState.openned;
             }
@@ -120,6 +130,19 @@ public class Lift : MonoBehaviour
             else
             {
                 destinationFloors.Add(newFloorNumber);
+                liftState = LiftState.down;
+            }
+        }
+        else if (liftState == LiftState.stopped)
+        {
+            destinationFloors.Add(newFloorNumber);
+
+            if (newFloorNumber > currentFloor)
+            {
+                liftState = LiftState.up;
+            }
+            else if (newFloorNumber < currentFloor)
+            {
                 liftState = LiftState.down;
             }
         }

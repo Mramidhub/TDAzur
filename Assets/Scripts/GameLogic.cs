@@ -5,13 +5,16 @@ using UnityEngine.Events;
 
 public class GameLogic : MonoBehaviour
 {
-    bool gameProcessOn;
+    bool gameProcessOn = true;
     Build build;
     Lift lift;
 
     UnityEvent startGame = new UnityEvent();
 
-
+    private void Start()
+    {
+        lift = FindObjectOfType<Lift>();
+    }
 
     private void FixedUpdate()
     {
