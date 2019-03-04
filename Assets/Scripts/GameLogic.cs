@@ -6,8 +6,8 @@ using UnityEngine.Events;
 public class GameLogic : MonoBehaviour
 {
     bool gameProcessOn = true;
-    Build build;
-    Lift lift;
+    [SerializeField] Build build;
+    [SerializeField] Lift lift;
 
     float liftSpeed = 1f;
     float liftSpeedTemp = 1f;

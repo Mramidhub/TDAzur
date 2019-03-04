@@ -829,6 +829,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f6abdd6af465ba47abba2675ab8087b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  build: {fileID: 595313610}
+  lift: {fileID: 566950580}
 --- !u!1 &378301659
 GameObject:
   m_ObjectHideFlags: 0
@@ -1038,6 +1040,7 @@ GameObject:
   - component: {fileID: 566950579}
   - component: {fileID: 566950578}
   - component: {fileID: 566950580}
+  - component: {fileID: 566950581}
   m_Layer: 5
   m_Name: UILift
   m_TagString: Untagged
@@ -1114,7 +1117,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab728c5757df9d34397f7ce3fa44db4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonParent: {fileID: 0}
+  buttonParent: {fileID: 1972078214}
+--- !u!114 &566950581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 566950576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c75482f343bfdd6429cc5d2217374f4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 3434569358663085812, guid: eae2b4bc72a5dca43b4ecd0352431a26, type: 3}
 --- !u!1 &582857791
 GameObject:
   m_ObjectHideFlags: 0
@@ -1375,7 +1391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a504470ba4117594bb671745c338780d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2372951588581614116, guid: 051103c651debdf479ea94a623b2c407, type: 3}
+  prefab: {fileID: 2372951588581614171, guid: 051103c651debdf479ea94a623b2c407, type: 3}
 --- !u!1 &628024982
 GameObject:
   m_ObjectHideFlags: 0
@@ -1569,6 +1585,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 798017044}
+  - component: {fileID: 798017045}
   m_Layer: 5
   m_Name: Lobby
   m_TagString: Untagged
@@ -1600,6 +1617,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &798017045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 798017043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46a40b3fc40b3c74a9c4e44ebb51fa3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floorsCount: {fileID: 628024984}
 --- !u!1 &853247867
 GameObject:
   m_ObjectHideFlags: 0
@@ -2994,7 +3024,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2047855062}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 798017045}
+        m_MethodName: StartGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &2047855062

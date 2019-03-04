@@ -8,7 +8,7 @@ public class FloorBuilder : MonoBehaviour
 
     public GameObject BuildFloor()
     {
-        var newFloor = Instantiate(prefab);
+        GameObject newFloor = Instantiate(prefab) as GameObject;
         return newFloor;
     }
 }

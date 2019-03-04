@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UILobby : MonoBehaviour
+public class UILobby : UIBase
 {
     AppManager appManager;
 
-    InputField floorsCount;
+    [SerializeField] InputField floorsCount;
 
-    private void Awake()
+    private void Start()
     {
         appManager = AppManager.instance;
     }
@@ -20,5 +20,7 @@ public class UILobby : MonoBehaviour
 
         var floors = int.Parse(floorsCount.text);
         appManager.InitApp(floors);
+
+        Hide();
     }
 }
