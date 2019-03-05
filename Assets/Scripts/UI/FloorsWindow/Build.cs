@@ -17,7 +17,7 @@ public class Build : UIBase
 
     public void MakeFloors(int count)
     {
-        for (int a = 0; a < count; a++)
+        for (int a = count-1; a >= 0; a--)
         {
             var floor = builder.BuildFloor();
             floor.transform.SetParent(floorParent);
@@ -42,5 +42,16 @@ public class Build : UIBase
         returnedFloor = floors.First(z => z.floorNumber == index);
 
         return returnedFloor;
+    }
+
+    public void AllFloorsDeactiveCalledStatus()
+    {
+        if (floors.Count > 0)
+        {
+            foreach (var f in floors)
+            {
+                f.DisableButtons();
+            }
+        }
     }
 }

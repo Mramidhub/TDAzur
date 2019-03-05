@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Linq;
 
 public class GameLogic : MonoBehaviour
 {
@@ -16,15 +17,15 @@ public class GameLogic : MonoBehaviour
     int currentFloor = 0;
 
     List<int> destinationFloors = new List<int>();
-    List<int> destinationFloorsUp = new List<int>();
-    List<int> destinationFloorsDown = new List<int>();
+    List<LiftCall> liftCalls = new List<LiftCall>();
 
     public enum LiftState { up, down, stopped, openned }
     LiftState liftState = LiftState.stopped;
     LiftState previosState = LiftState.stopped;
 
  
-    UnityEvent startGame = new UnityEvent();
+    public UnityEvent startGame = new UnityEvent();
+    public EventOpenDoor openDoorEvent = new EventOpenDoor();
 
     private void Start()
     {
@@ -43,7 +44,6 @@ public class GameLogic : MonoBehaviour
     {
         build.MakeFloors(floorCount);
         lift.MakeButtons(floorCount);
-
 
         startGame.Invoke();
         gameProcessOn = true;
@@ -79,88 +79,103 @@ public class GameLogic : MonoBehaviour
 
             openDoorTime = tempOpenDoorTime;
             liftState = previosState;
-            Debug.Log("status " + liftState);
 
-            if (currentFloor == destinationFloors[destinationFloors.Count - 1])
+            if (destinationFloors.Count == 0)
             {
-                if (liftState == LiftState.up && destinationFloorsDown.Count > 0)
+                if (liftCalls.Count > 0)
                 {
-                    destinationFloors = destinationFloorsDown;
-                    destinationFloorsUp.Clear();
+                    var firstCall = liftCalls[0];
+                    var newDestinationFloor = firstCall.floorNumber;
 
-                    liftState = LiftState.down;
-                }
-                else if (liftState == LiftState.down && destinationFloorsUp.Count > 0)
-                {
-                    destinationFloors = destinationFloorsUp;
-                    destinationFloorsDown.Clear();
+                    if (newDestinationFloor > currentFloor)
+                    {
+                        liftState = LiftState.up;
+                    }
+                    else if (newDestinationFloor < currentFloor)
+                    {
+                        liftState = LiftState.down;
+                    }
 
-                    liftState = LiftState.up;
+                    destinationFloors.Add(newDestinationFloor);
+                    return;
                 }
-                else
-                {
-                    liftState = LiftState.stopped;
-                    SetDoorStatus(currentFloor, false);
 
-                    destinationFloors.Clear();
-                    destinationFloorsDown.Clear();
-                    destinationFloorsUp.Clear();
-                }
-                return;
+                Stop();
             }
+        }
+
+        if (liftSpeed > 0)
+        {
+            liftSpeed -= Time.deltaTime;
+            return;
         }
 
         if (liftState == LiftState.up)
         {
-            if (liftSpeed > 0)
-            {
-                liftSpeed -= Time.deltaTime;
-                return;
-            }
-
             currentFloor += 1;
-            liftSpeed = liftSpeedTemp;
-
-            Debug.Log("on floor " + currentFloor);
-
-            if (destinationFloors.Contains(currentFloor))
-            {
-                var floor = build.GetFloor(currentFloor);
-                if (floor.status == Floor.CalledStatus.toDown) return;
-
-                previosState = liftState;
-                liftState = LiftState.openned;
-
-                SetDoorStatus(currentFloor, true);
-
-                Debug.Log("floor up " + currentFloor + " " + "door open");
-            }
         }
         else if (liftState == LiftState.down)
         {
-            if (liftSpeed > 0)
-            {
-                liftSpeed -= Time.deltaTime;
-                return;
-            }
-            Debug.Log("floor" + currentFloor);
-
             currentFloor -= 1;
-            liftSpeed = liftSpeedTemp;
-
-            if (destinationFloors.Contains(currentFloor))
-            {
-                var floor = build.GetFloor(currentFloor);
-                if (floor.status == Floor.CalledStatus.toUp) return;
-
-                Debug.Log("next floor down " + currentFloor + " " + "door open");
-
-                previosState = liftState;
-                liftState = LiftState.openned;
-
-                SetDoorStatus(currentFloor, true);
-            }
         }
+
+        liftSpeed = liftSpeedTemp;
+        Debug.Log("on floor " + (currentFloor + 1));
+
+        LiftCall floorOnCall = null;
+
+        if (liftCalls.Count > 0)
+        {
+            liftCalls.ForEach(x =>
+            {
+                if (x.floorNumber == currentFloor)
+                {
+                    floorOnCall = x;
+                }
+            }); 
+        }
+
+        if (floorOnCall != null)
+        {
+            var floor = build.GetFloor(currentFloor);
+
+            if (destinationFloors.Count > 1 || destinationFloors.Count == 1 && destinationFloors[0] != floorOnCall.floorNumber)
+            {
+                if (liftState == LiftState.up && floorOnCall.calledStatus != Floor.CalledStatus.toUp
+                    || liftState == LiftState.down && floorOnCall.calledStatus != Floor.CalledStatus.toDown)
+                {
+                    return;
+                }
+            }
+  
+            previosState = liftState;
+            liftState = LiftState.openned;
+
+            SetDoorStatus(currentFloor, true);
+            liftCalls.Remove(floorOnCall);
+            // Снять состояние в лифте.
+
+            Debug.Log("floor on call " + (currentFloor + 1) + " " + "door open");
+            openDoorEvent.Invoke(currentFloor);
+        }
+
+        if (destinationFloors.Contains(currentFloor))
+        {
+            var floor = build.GetFloor(currentFloor);
+
+            previosState = liftState;
+            liftState = LiftState.openned;
+
+            SetDoorStatus(currentFloor, true);
+            liftCalls.Remove(floorOnCall);
+            // Снять состояние в лифте.
+
+            // Убираем етаж из списка назначений из лифта.
+            destinationFloors.Remove(currentFloor);
+            Debug.Log("floor " + (currentFloor + 1) + " " + "door open");
+            openDoorEvent.Invoke(currentFloor);
+        }
+ 
     }
 
     void SetDoorStatus(int index, bool open)
@@ -177,84 +192,83 @@ public class GameLogic : MonoBehaviour
     public void Stop()
     {
         destinationFloors.Clear();
+        liftCalls.Clear();
         liftSpeed = liftSpeedTemp;
         openDoorTime = tempOpenDoorTime;
+        liftState = LiftState.stopped;
+
+        SetDoorStatus(currentFloor, false);
+        AllFloorsDeactiveCalledStatus();
     }
 
-    public void AddDestinationFloor(int newFloorNumber)
+    public void AddLiftCall(int floorNumber, bool up)
     {
-        //if (directionCall == LiftDirectionCall.toDown)
-        //{
-        //    destinationFloorsDown.Add(newFloorNumber);
+        var liftCall = new LiftCall();
 
-        //}
-        //else if (directionCall == LiftDirectionCall.toUp)
-        //{
-        //    destinationFloorsUp.Add(newFloorNumber);
+        if (up)
+        {
+            liftCall.calledStatus = Floor.CalledStatus.toUp;
+        }
+        else
+        {
+            liftCall.calledStatus = Floor.CalledStatus.toDown;
+        }
 
-        //}
+        liftCall.floorNumber = floorNumber;
+        liftCalls.Add(liftCall);
 
-        //if (liftState == LiftState.stopped)
-        //{
-        //    if (newFloorNumber < currentFloor)
-        //    {
-        //        liftState = LiftState.down;
-        //        destinationFloorsUp.Clear();
-        //        destinationFloorsDown.Add(newFloorNumber);
-        //        destinationFloors = destinationFloorsDown;
-        //    }
-        //    else if (newFloorNumber > currentFloor)
-        //    {
-        //        liftState = LiftState.up;
-        //        destinationFloorsDown.Clear();
-        //        destinationFloorsUp.Add(newFloorNumber);
-        //        destinationFloors = destinationFloorsUp;
-        //    }
-        //    return;
-        //}
+        if (liftState == LiftState.stopped)
+        {
+            AddDestinationFloor(floorNumber);
+        }
+    }
 
-
+    public bool AddDestinationFloor(int newFloorNumber)
+    {
         switch (liftState)
         {
             case LiftState.up:
                 if (newFloorNumber <= currentFloor)
                 {
-                    destinationFloorsDown.Add(newFloorNumber);
-                    return;
-                }
-                else
-                {
-                    destinationFloorsUp.Add(newFloorNumber);
+                    return false;
                 }
                 break;
             case LiftState.down:
                 if (newFloorNumber >= currentFloor)
                 {
-                    destinationFloorsUp.Add(newFloorNumber);
-                    return;
-                }
-                else
-                {
-                    destinationFloorsDown.Add(newFloorNumber);
+                    return false;
                 }
                 break;
             case LiftState.stopped:
                 if (newFloorNumber > currentFloor)
                 {
+                    destinationFloors.Clear();
+                    destinationFloors.Add(newFloorNumber);
                     liftState = LiftState.up;
-                    destinationFloorsUp.Add(newFloorNumber);
-                    destinationFloors = destinationFloorsUp;
                 }
-                else if (newFloorNumber < currentFloor)
+                else if(newFloorNumber < currentFloor)
                 {
+                    destinationFloors.Clear();
+                    destinationFloors.Add(newFloorNumber);
                     liftState = LiftState.down;
-                    destinationFloorsDown.Add(newFloorNumber);
-                    destinationFloors = destinationFloorsDown;
                 }
-                break;
-
+                return true;
         }
-        return;
+
+        destinationFloors.Add(newFloorNumber);
+
+        return true;
     }
 
+    void AllFloorsDeactiveCalledStatus()
+    {
+        build.AllFloorsDeactiveCalledStatus();
+    }
+
+}
+
+public class LiftCall
+{
+    public int floorNumber = 0;
+    public Floor.CalledStatus calledStatus = Floor.CalledStatus.none;
 }

@@ -6,12 +6,14 @@ public class Lift : MonoBehaviour
 {
     ButtonBuilder builder;
     List<LiftButton> buttons = new List<LiftButton>();
+    GameLogic gameLogic;
 
     [SerializeField] Transform buttonParent;
 
     private void Start()
     {
         builder = FindObjectOfType<ButtonBuilder>();
+        gameLogic = FindObjectOfType<GameLogic>();
     }
 
     public void MakeButtons(int count)
@@ -25,6 +27,20 @@ public class Lift : MonoBehaviour
             buttonComponent.Init(a);
 
             buttons.Add(button.GetComponent<LiftButton>());
+        }
+    }
+
+    public void Stop()
+    {
+        gameLogic.Stop();
+        DeactiveAllButtons();
+    }
+
+    public void DeactiveAllButtons()
+    {
+        foreach (var b in buttons)
+        {
+            b.DeactiveButton(b.floorNumber);
         }
     }
 

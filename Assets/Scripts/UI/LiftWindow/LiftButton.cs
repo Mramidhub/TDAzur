@@ -6,12 +6,16 @@ using UnityEngine.UI;
 public class LiftButton : MonoBehaviour
 {
     [SerializeField] Text numberText;
-    int floorNumber = 0;
+    Image image;
+    Color defaultColor;
+    public int floorNumber = 0;
     GameLogic gameLogic;
 
     private void Start()
     {
         gameLogic = FindObjectOfType<GameLogic>();
+        image = GetComponent<Image>();
+        defaultColor = image.color;
     }
 
     public void Init(int number)
@@ -24,7 +28,22 @@ public class LiftButton : MonoBehaviour
     {
         if (gameLogic)
         {
-            gameLogic.AddDestinationFloor(floorNumber, GameLogic.LiftDirectionCall.none);
+            var result = gameLogic.AddDestinationFloor(floorNumber);
+
+            if (result)
+            {
+                image.color = Color.red;
+                gameLogic.openDoorEvent.AddListener(DeactiveButton);
+            }
+        }
+    }
+
+    public void DeactiveButton(int floor)
+    {
+        if (floor == floorNumber)
+        {
+            image.color = defaultColor;
+            gameLogic.openDoorEvent.RemoveListener(DeactiveButton);
         }
     }
 }

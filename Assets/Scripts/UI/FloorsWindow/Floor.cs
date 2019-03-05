@@ -8,13 +8,20 @@ public class Floor : UIBase
     public int floorNumber = 0;
     [SerializeField] Text floorNumberText;
     [SerializeField] Text doorStatusText;
+    [SerializeField] Image backGroundDoorStatus;
     [SerializeField] Button upButton;
     [SerializeField] Button downButton;
 
+    Color doorStatusBackColor;
     GameLogic gameLogic;
 
     public enum CalledStatus {toUp, toDown, none}
     public CalledStatus status = CalledStatus.none;
+
+    private void Start()
+    {
+        doorStatusBackColor = backGroundDoorStatus.color;
+    }
 
     public void Init(int number)
     {
@@ -29,10 +36,12 @@ public class Floor : UIBase
         if (oppened)
         {
             doorStatusText.text = "Doors oppened";
+            backGroundDoorStatus.color = Color.red;
         }
         else
         {
             doorStatusText.text = "Doors closed";
+            backGroundDoorStatus.color = doorStatusBackColor;
         }
 
         UpButtonDisable();
@@ -43,8 +52,7 @@ public class Floor : UIBase
     {
         if (status == CalledStatus.toDown) return;
 
-        gameLogic.AddDestinationFloor(floorNumber);
-
+        gameLogic.AddLiftCall(floorNumber, true);
 
         upButton.GetComponent<Image>().color = Color.red;
         status = CalledStatus.toUp;
@@ -60,7 +68,7 @@ public class Floor : UIBase
     {
         if (status == CalledStatus.toUp) return;
 
-        gameLogic.AddDestinationFloor(floorNumber);
+        gameLogic.AddLiftCall(floorNumber, false);
 
         downButton.GetComponent<Image>().color = Color.red;
         status = CalledStatus.toDown;
@@ -70,6 +78,12 @@ public class Floor : UIBase
     {
         downButton.GetComponent<Image>().color = Color.black;
         status = CalledStatus.none;
+    }
+
+    public void DisableButtons()
+    {
+        DownButtonDisable();
+        UpButtonDisable();
     }
 
 
