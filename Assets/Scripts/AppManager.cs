@@ -7,8 +7,8 @@ public class AppManager : MonoBehaviour
 
     public static AppManager instance;
 
-    UIManager uIManager;
-    GameLogic gameLogic;
+    public UIManager uIManager;
+    public GameLogic gameLogic;
 
     public enum GameState { Lobby, Game}
     GameState gameState = GameState.Lobby;

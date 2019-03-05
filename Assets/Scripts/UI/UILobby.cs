@@ -17,6 +17,7 @@ public class UILobby : UIBase
     public void StartGame()
     {
         if (!appManager) return;
+        if (string.IsNullOrEmpty(floorsCount.text)) return;
 
         var floors = int.Parse(floorsCount.text);
         appManager.InitApp(floors);

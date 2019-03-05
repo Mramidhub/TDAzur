@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class Lift : MonoBehaviour
 {
-    ButtonBuilder builder = new ButtonBuilder();
-    List<LiftButton> buttons;
+    ButtonBuilder builder;
+    List<LiftButton> buttons = new List<LiftButton>();
 
     [SerializeField] Transform buttonParent;
+
+    private void Start()
+    {
+        builder = FindObjectOfType<ButtonBuilder>();
+    }
 
     public void MakeButtons(int count)
     {
@@ -16,8 +21,8 @@ public class Lift : MonoBehaviour
             var button = builder.BuildButton();
             button.transform.SetParent(buttonParent);
 
-            var floorComponent = button.GetComponent<LiftButton>();
-            floorComponent.floorNumber = a;
+            var buttonComponent = button.GetComponent<LiftButton>();
+            buttonComponent.Init(a);
 
             buttons.Add(button.GetComponent<LiftButton>());
         }
