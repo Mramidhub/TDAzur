@@ -7,6 +7,9 @@ using System.Linq;
 public class GameLogic : MonoBehaviour
 {
     bool gameProcessOn = false;
+    bool toCallAfterDestinatoin = false;
+    bool doorOpen = false;
+
     [SerializeField] Building building;
     [SerializeField] Lift lift;
 
@@ -20,10 +23,8 @@ public class GameLogic : MonoBehaviour
     List<int> destinationFloors = new List<int>();
     List<LiftCall> liftCalls = new List<LiftCall>();
 
-    public enum LiftState { up, down, stopped, openned }
+    public enum LiftState { up, down, stopped}
     LiftState liftState = LiftState.stopped;
-    LiftState previosState = LiftState.stopped;
-
  
     public UnityEvent startGame = new UnityEvent();
     public EventOpenDoor openDoorEvent = new EventOpenDoor();
@@ -34,7 +35,14 @@ public class GameLogic : MonoBehaviour
     {
         if (gameProcessOn)
         {
-            LiftMove();
+            if (!toCallAfterDestinatoin)
+            {
+                LiftMove();
+            }
+            else
+            {
+                MoveToCallAfterFinalDestination();
+            }
         }
     }
 
@@ -64,7 +72,7 @@ public class GameLogic : MonoBehaviour
             return;
         }
 
-        if (liftState == LiftState.openned)
+        if (doorOpen)
         {
             if (openDoorTime > 0)
             {
@@ -75,7 +83,7 @@ public class GameLogic : MonoBehaviour
             SetDoorStatus(currentFloor, false);
 
             openDoorTime = tempOpenDoorTime;
-            liftState = previosState;
+            doorOpen = false;
 
             if (destinationFloors.Count == 0)
             {
@@ -93,7 +101,12 @@ public class GameLogic : MonoBehaviour
                         liftState = LiftState.down;
                     }
 
+                    liftCalls.Remove(firstCall);
+
                     destinationFloors.Add(newDestinationFloor);
+
+                    toCallAfterDestinatoin = true;
+
                     return;
                 }
 
@@ -146,8 +159,7 @@ public class GameLogic : MonoBehaviour
                 }
             }
   
-            previosState = liftState;
-            liftState = LiftState.openned;
+            doorOpen = true;
 
             SetDoorStatus(currentFloor, true);
             liftCalls.Remove(floorOnCall);
@@ -159,9 +171,7 @@ public class GameLogic : MonoBehaviour
         {
             var floor = building.GetFloor(currentFloor);
 
-            previosState = liftState;
-            liftState = LiftState.openned;
-
+            doorOpen = true;
             SetDoorStatus(currentFloor, true);
             liftCalls.Remove(floorOnCall);
 
@@ -170,6 +180,66 @@ public class GameLogic : MonoBehaviour
             openDoorEvent.Invoke(currentFloor);
         }
  
+    }
+
+    void MoveToCallAfterFinalDestination()
+    {
+        if (liftState == LiftState.stopped)
+        {
+            return;
+        }
+
+        if (doorOpen)
+        {
+            if (openDoorTime > 0)
+            {
+                openDoorTime -= Time.deltaTime;
+                return;
+            }
+
+            SetDoorStatus(currentFloor, false);
+
+            openDoorTime = tempOpenDoorTime;
+            doorOpen = false;
+
+            if (destinationFloors.Count == 0)
+            {
+                toCallAfterDestinatoin = false;
+                Stop();
+            }
+        }
+
+        if (liftSpeed > 0)
+        {
+            liftSpeed -= Time.deltaTime;
+            return;
+        }
+
+        if (liftState == LiftState.up)
+        {
+            currentFloor += 1;
+        }
+        else if (liftState == LiftState.down)
+        {
+            currentFloor -= 1;
+        }
+
+        changeFloorEvent.Invoke(currentFloor);
+
+        liftSpeed = liftSpeedTemp;
+
+        if (destinationFloors.Contains(currentFloor))
+        {
+            var floor = building.GetFloor(currentFloor);
+
+            SetDoorStatus(currentFloor, true);
+
+            doorOpen = true;
+
+            destinationFloors.Remove(currentFloor);
+
+            openDoorEvent.Invoke(currentFloor);
+        }
     }
 
     void SetDoorStatus(int index, bool open)
@@ -219,6 +289,8 @@ public class GameLogic : MonoBehaviour
 
     public bool AddDestinationFloor(int newFloorNumber)
     {
+        if (toCallAfterDestinatoin) return false;
+
         switch (liftState)
         {
             case LiftState.up:
@@ -261,8 +333,4 @@ public class GameLogic : MonoBehaviour
 
 }
 
-public class LiftCall
-{
-    public int floorNumber = 0;
-    public Floor.CalledStatus calledStatus = Floor.CalledStatus.none;
-}
+
