@@ -5,22 +5,16 @@ using System.Linq;
 
 public class Build : UIBase
 {
-    FloorBuilder builder;
+    [SerializeField] FloorBuilder builder;
     List<Floor> floors = new List<Floor>();
 
     [SerializeField] Transform floorParent;
 
-    private void Start()
-    {
-        builder = GameObject.FindObjectOfType<FloorBuilder>();
-    }
-
-    public void MakeFloors(int count)
+    public void Init(int count)
     {
         for (int a = count-1; a >= 0; a--)
         {
-            var floor = builder.BuildFloor();
-            floor.transform.SetParent(floorParent);
+            var floor = builder.BuildProduct(floorParent);
 
             var floorComponent = floor.GetComponent<Floor>();
             floorComponent.floorNumber = a;

@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FloorBuilder : MonoBehaviour
+public class FloorBuilder : BuilderBase
 {
     [SerializeField] GameObject prefab;
 
-    public GameObject BuildFloor()
+    public override GameObject BuildProduct(Transform parent)
     {
-        GameObject newFloor = Instantiate(prefab) as GameObject;
+        GameObject newFloor = Instantiate(prefab, parent) as GameObject;
         return newFloor;
     }
 }

@@ -26,6 +26,7 @@ public class Floor : UIBase
     public void Init(int number)
     {
         gameLogic = AppManager.instance.gameLogic;
+        gameLogic.openDoorEvent.AddListener(OpenDoorHandler);
 
         floorNumber = number;
         floorNumberText.text = (number + 1).ToString();
@@ -84,6 +85,15 @@ public class Floor : UIBase
     {
         DownButtonDisable();
         UpButtonDisable();
+    }
+
+    public void OpenDoorHandler(int floor)
+    {
+        if (floor == floorNumber)
+        {
+            DisableButtons();
+            status = CalledStatus.none;
+        }
     }
 
 

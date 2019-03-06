@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ButtonBuilder : MonoBehaviour
+public class ButtonBuilder : BuilderBase
 {
     [SerializeField] GameObject prefab;
 
-    public GameObject BuildButton()
+    public override GameObject BuildProduct(Transform parent)
     {
-        var newButton = Instantiate(prefab);
-        return newButton;
+        GameObject newFloor = Instantiate(prefab, parent) as GameObject;
+        return newFloor;
     }
 }

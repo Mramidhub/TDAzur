@@ -1,33 +1,36 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Lift : MonoBehaviour
+public class Lift : UIBase
 {
-    ButtonBuilder builder;
+    [SerializeField] ButtonBuilder builder;
     List<LiftButton> buttons = new List<LiftButton>();
+    [SerializeField] StatusBar statusBar;
+    [SerializeField] Scrollbar scrollBar;
     GameLogic gameLogic;
 
     [SerializeField] Transform buttonParent;
 
     private void Start()
     {
-        builder = FindObjectOfType<ButtonBuilder>();
         gameLogic = FindObjectOfType<GameLogic>();
     }
 
-    public void MakeButtons(int count)
+    public void Init(int count)
     {
         for (int a = 0; a < count; a++)
         {
-            var button = builder.BuildButton();
-            button.transform.SetParent(buttonParent);
+            var button = builder.BuildProduct(buttonParent);
 
             var buttonComponent = button.GetComponent<LiftButton>();
             buttonComponent.Init(a);
 
             buttons.Add(button.GetComponent<LiftButton>());
         }
+
+        statusBar.Init(count);
     }
 
     public void Stop()

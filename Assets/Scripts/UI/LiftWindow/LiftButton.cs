@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LiftButton : MonoBehaviour
+public class LiftButton : UIBase
 {
     [SerializeField] Text numberText;
     Image image;

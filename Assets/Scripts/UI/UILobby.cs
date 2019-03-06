@@ -22,6 +22,7 @@ public class UILobby : UIBase
         var floors = int.Parse(floorsCount.text);
         appManager.InitApp(floors);
 
+        appManager.uIManager.game.Show();
         Hide();
     }
 }

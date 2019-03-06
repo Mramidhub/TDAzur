@@ -6,14 +6,15 @@ using System.Linq;
 
 public class GameLogic : MonoBehaviour
 {
-    bool gameProcessOn = true;
+    bool gameProcessOn = false;
     [SerializeField] Build build;
     [SerializeField] Lift lift;
 
-    float liftSpeed = 2f;
-    float liftSpeedTemp = 2f;
-    float openDoorTime = 2f;
-    float tempOpenDoorTime = 2f;
+    [SerializeField] float liftSpeed = 2f;
+    [SerializeField] float liftSpeedTemp = 2f;
+    [SerializeField] float openDoorTime = 2f;
+    [SerializeField] float tempOpenDoorTime = 2f;
+
     int currentFloor = 0;
 
     List<int> destinationFloors = new List<int>();
@@ -26,11 +27,8 @@ public class GameLogic : MonoBehaviour
  
     public UnityEvent startGame = new UnityEvent();
     public EventOpenDoor openDoorEvent = new EventOpenDoor();
+    public EventChangeFloor changeFloorEvent = new EventChangeFloor();
 
-    private void Start()
-    {
-        lift = FindObjectOfType<Lift>();
-    }
 
     private void FixedUpdate()
     {
@@ -42,11 +40,13 @@ public class GameLogic : MonoBehaviour
 
     public void InitGame(int floorCount)
     {
-        build.MakeFloors(floorCount);
-        lift.MakeButtons(floorCount);
+        build.Init(floorCount);
+        lift.Init(floorCount);
 
         startGame.Invoke();
         gameProcessOn = true;
+
+        currentFloor = 0;
     }
 
  
@@ -61,7 +61,6 @@ public class GameLogic : MonoBehaviour
     {
         if (liftState == LiftState.stopped)
         {
-            Debug.Log("stopped ");
             return;
         }
 
@@ -72,8 +71,6 @@ public class GameLogic : MonoBehaviour
                 openDoorTime -= Time.deltaTime;
                 return;
             }
-
-            Debug.Log("door closed ");
 
             SetDoorStatus(currentFloor, false);
 
@@ -119,8 +116,9 @@ public class GameLogic : MonoBehaviour
             currentFloor -= 1;
         }
 
+        changeFloorEvent.Invoke(currentFloor);
+
         liftSpeed = liftSpeedTemp;
-        Debug.Log("on floor " + (currentFloor + 1));
 
         LiftCall floorOnCall = null;
 
@@ -153,9 +151,7 @@ public class GameLogic : MonoBehaviour
 
             SetDoorStatus(currentFloor, true);
             liftCalls.Remove(floorOnCall);
-            // Снять состояние в лифте.
 
-            Debug.Log("floor on call " + (currentFloor + 1) + " " + "door open");
             openDoorEvent.Invoke(currentFloor);
         }
 
@@ -168,11 +164,9 @@ public class GameLogic : MonoBehaviour
 
             SetDoorStatus(currentFloor, true);
             liftCalls.Remove(floorOnCall);
-            // Снять состояние в лифте.
 
-            // Убираем етаж из списка назначений из лифта.
             destinationFloors.Remove(currentFloor);
-            Debug.Log("floor " + (currentFloor + 1) + " " + "door open");
+
             openDoorEvent.Invoke(currentFloor);
         }
  
