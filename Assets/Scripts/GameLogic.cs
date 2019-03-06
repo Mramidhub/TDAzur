@@ -7,13 +7,13 @@ using System.Linq;
 public class GameLogic : MonoBehaviour
 {
     bool gameProcessOn = false;
-    [SerializeField] Build build;
+    [SerializeField] Building building;
     [SerializeField] Lift lift;
 
     [SerializeField] float liftSpeed = 2f;
-    [SerializeField] float liftSpeedTemp = 2f;
+     float liftSpeedTemp = 2f;
     [SerializeField] float openDoorTime = 2f;
-    [SerializeField] float tempOpenDoorTime = 2f;
+     float tempOpenDoorTime = 2f;
 
     int currentFloor = 0;
 
@@ -40,7 +40,7 @@ public class GameLogic : MonoBehaviour
 
     public void InitGame(int floorCount)
     {
-        build.Init(floorCount);
+        building.Init(floorCount);
         lift.Init(floorCount);
 
         startGame.Invoke();
@@ -135,7 +135,7 @@ public class GameLogic : MonoBehaviour
 
         if (floorOnCall != null)
         {
-            var floor = build.GetFloor(currentFloor);
+            var floor = building.GetFloor(currentFloor);
 
             if (destinationFloors.Count > 1 || destinationFloors.Count == 1 && destinationFloors[0] != floorOnCall.floorNumber)
             {
@@ -157,7 +157,7 @@ public class GameLogic : MonoBehaviour
 
         if (destinationFloors.Contains(currentFloor))
         {
-            var floor = build.GetFloor(currentFloor);
+            var floor = building.GetFloor(currentFloor);
 
             previosState = liftState;
             liftState = LiftState.openned;
@@ -174,7 +174,7 @@ public class GameLogic : MonoBehaviour
 
     void SetDoorStatus(int index, bool open)
     {
-        var floor = build.GetFloor(index);
+        var floor = building.GetFloor(index);
 
         if (floor)
         {
@@ -256,7 +256,7 @@ public class GameLogic : MonoBehaviour
 
     void AllFloorsDeactiveCalledStatus()
     {
-        build.AllFloorsDeactiveCalledStatus();
+        building.AllFloorsDeactiveCalledStatus();
     }
 
 }

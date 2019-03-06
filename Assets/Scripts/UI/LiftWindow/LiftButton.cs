@@ -9,6 +9,7 @@ public class LiftButton : UIBase
     Image image;
     Color defaultColor;
     public int floorNumber = 0;
+
     GameLogic gameLogic;
 
     private void Start()

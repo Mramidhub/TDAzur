@@ -6,13 +6,17 @@ using UnityEngine.UI;
 public class Floor : UIBase
 {
     public int floorNumber = 0;
+
     [SerializeField] Text floorNumberText;
     [SerializeField] Text doorStatusText;
     [SerializeField] Image backGroundDoorStatus;
     [SerializeField] Button upButton;
     [SerializeField] Button downButton;
 
+    Color upButtonDefaultColor;
+    Color downButtonDefaultColor;
     Color doorStatusBackColor;
+
     GameLogic gameLogic;
 
     public enum CalledStatus {toUp, toDown, none}
@@ -21,6 +25,9 @@ public class Floor : UIBase
     private void Start()
     {
         doorStatusBackColor = backGroundDoorStatus.color;
+
+        upButtonDefaultColor = upButton.GetComponent<Image>().color;
+        downButtonDefaultColor = downButton.GetComponent<Image>().color;
     }
 
     public void Init(int number)
@@ -36,7 +43,7 @@ public class Floor : UIBase
     {
         if (oppened)
         {
-            doorStatusText.text = "Doors oppened";
+            doorStatusText.text = "Door open";
             backGroundDoorStatus.color = Color.red;
         }
         else
@@ -61,7 +68,7 @@ public class Floor : UIBase
 
     public void UpButtonDisable()
     {
-        upButton.GetComponent<Image>().color = Color.black;
+        upButton.GetComponent<Image>().color = upButtonDefaultColor;
         status = CalledStatus.none;
     }
 
@@ -77,7 +84,7 @@ public class Floor : UIBase
 
     public void DownButtonDisable()
     {
-        downButton.GetComponent<Image>().color = Color.black;
+        downButton.GetComponent<Image>().color = downButtonDefaultColor;
         status = CalledStatus.none;
     }
 

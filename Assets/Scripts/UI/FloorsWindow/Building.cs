@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class Build : UIBase
+public class Building : UIBase
 {
     [SerializeField] FloorBuilder builder;
     List<Floor> floors = new List<Floor>();
@@ -22,6 +22,9 @@ public class Build : UIBase
 
             floors.Add(floorComponent);
         }
+
+        var currentPos = floorParent.transform;
+        floorParent.localPosition = new Vector3(currentPos.localPosition.x, 100000, currentPos.localPosition.z);
     }
 
     public int GetFloorCount()

@@ -20,8 +20,6 @@ public class AppManager : MonoBehaviour
         {
             instance = this;
         }
-
-        gameLogic = FindObjectOfType<GameLogic>();
     }
 
     public void InitApp(int floors)

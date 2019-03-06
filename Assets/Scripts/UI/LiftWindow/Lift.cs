@@ -31,6 +31,9 @@ public class Lift : UIBase
         }
 
         statusBar.Init(count);
+
+        var currentPos = buttonParent.transform;
+        buttonParent.localPosition = new Vector3(currentPos.localPosition.x, -100000, currentPos.localPosition.z);
     }
 
     public void Stop()
